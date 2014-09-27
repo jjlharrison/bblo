@@ -67,9 +67,10 @@ define([
                     else {
                         require(['layouts/' + view.layout], function(Layout) {
                             var layout = new Layout();
-                            layout.render();
-                            view.$layout = layout.$el;
-                            fulfill();
+                            layout.render().then(function() {
+                                view.$layout = layout.$el;
+                                fulfill();
+                            });
                         });
                     }
                 }
