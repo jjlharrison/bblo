@@ -8,9 +8,22 @@ define([
         rootNamespace = 'bblo',
         viewNamespace = rootNamespace + '-view';
 
+    function removeSubview() {
+        var subview = $(this).data(viewNamespace);
+        if (subview) { subview.remove(); }
+    }
+
     var View = Backbone.View.extend({
 
         subviews: {},
+
+        remove: function() {
+            var view = this;
+            view.$el.find('.' + viewNamespace).each(removeSubview).end().remove();
+            view.stopListening();
+            if (views.hasOwnProperty(view.cmsid)) { delete views[view.cmsid]; }
+            return view;
+        },
 
         doRender: function(template) {
             var view = this;
@@ -22,11 +35,7 @@ define([
                 view.$el.html(template(view.model)).addClass(viewNamespace).data(viewNamespace, view);
 
                 // Tidy up views being replaced.
-                $target.find('.' + viewNamespace).each(function() {
-                    var oldView = $(this).data(viewNamespace);
-                    delete views[oldView.cmsid];
-                    oldView.remove();
-                }).end().empty();
+                $target.find('.' + viewNamespace).each(removeSubview).end().empty();
 
                 $target.append(view.$el);
 
