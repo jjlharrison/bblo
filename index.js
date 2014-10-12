@@ -4,7 +4,9 @@ define([
     'backbone'
 ], function($, _, Backbone) {
 
-    var views = {};
+    var views = {},
+        rootNamespace = 'bblo',
+        viewNamespace = rootNamespace + '-view';
 
     var View = Backbone.View.extend({
 
@@ -17,11 +19,11 @@ define([
                 var target = view.target || '.app',
                     $target = view.$layout ? view.$layout.find(target) : $(target);
 
-                view.$el.html(template(view.model)).addClass('cms-view').data('cms-view', view);
+                view.$el.html(template(view.model)).addClass(viewNamespace).data(viewNamespace, view);
 
                 // Tidy up views being replaced.
-                $target.find('.cms-view').each(function() {
-                    var oldView = $(this).data('cms-view');
+                $target.find('.' + viewNamespace).each(function() {
+                    var oldView = $(this).data(viewNamespace);
                     delete views[oldView.cmsid];
                     oldView.remove();
                 }).end().empty();
@@ -37,7 +39,7 @@ define([
         renderTemplate: function() {
             var view = this;
 
-            view.cmsid = view.cmsid || _.uniqueId('cms-view-');
+            view.cmsid = view.cmsid || _.uniqueId(viewNamespace + '-');
 
             return new Promise(function(fulfill, reject) {
                 view.loadLayout().then(function() {
